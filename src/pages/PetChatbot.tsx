@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Send, Bot, User } from "lucide-react";
 import { geminiService } from "@/lib/gemini";
 import { useToast } from "@/hooks/use-toast";
+import AppLayout from "@/components/AppLayout";
 
 interface Message {
   role: "user" | "assistant";
@@ -47,123 +47,133 @@ export default function PetChatbot() {
     setIsLoading(true);
 
     try {
-      const conversationHistory = messages.map(msg => ({
-        role: msg.role === "user" ? "user" : "assistant",
-        content: msg.content
-      }));
+      if (import.meta.env.VITE_GEMINI_API_KEY) {
+        const conversationHistory = messages.map(msg => ({
+          role: msg.role === "user" ? "user" : "assistant",
+          content: msg.content
+        }));
 
-      const response = await geminiService.chatWithPetExpert(input, conversationHistory);
+        const response = await geminiService.chatWithPetExpert(input, conversationHistory);
+        addAssistantMessage(response);
+      } else {
+        // Mock responses if no API key
+        setTimeout(() => {
+          const lowerInput = input.toLowerCase();
+          let mockResponse = "I'm sorry, I didn't quite catch that. Could you ask me about your pet's health, diet, or behavior?";
+          
+          if (lowerInput.includes("feed") || lowerInput.includes("food") || lowerInput.includes("diet")) {
+            mockResponse = "A balanced diet is crucial! Ensure you're feeding high-quality pet food tailored to their age and size. Avoid human foods like chocolate, grapes, and onions as they are highly toxic. 🥩";
+          } else if (lowerInput.includes("scratch") || lowerInput.includes("itch") || lowerInput.includes("skin")) {
+            mockResponse = "Excessive scratching can indicate allergies, fleas, or dry skin. Check for redness or pests. Our SkinSense AI module can actually help analyze this in detail! If it persists, consult your vet. 🔬";
+          } else if (lowerInput.includes("bark") || lowerInput.includes("cry") || lowerInput.includes("whine")) {
+            mockResponse = "Dogs bark to communicate! It could mean they are bored, anxious, or alerting you to something. Try our BarkSense AI to get a translation of their emotional state based on bark acoustics. 🐕";
+          } else if (lowerInput.includes("hi") || lowerInput.includes("hello")) {
+            mockResponse = "Hello there! How is your furry friend doing today? Need any advice on their health or activities? 👋";
+          } else if (lowerInput.includes("sleep") || lowerInput.includes("tired")) {
+            mockResponse = "Adult dogs typically sleep 12-14 hours a day, while puppies and seniors may sleep up to 18 hours! If they seem unusually lethargic, it's best to check their TemperatureSense vitals. 💤";
+          }
 
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: response,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
+          addAssistantMessage(mockResponse);
+        }, 1500);
+      }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to get response. Please try again.",
         variant: "destructive"
       });
-    } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            🐾 Pet AI Assistant
-          </h1>
-          <p className="text-gray-800">
-            Ask me anything about your furry friends!
-          </p>
-        </div>
+  const addAssistantMessage = (content: string) => {
+    const assistantMessage: Message = {
+      role: "assistant",
+      content,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, assistantMessage]);
+    setIsLoading(false);
+  };
 
-        <Card className="h-[600px] flex flex-col">
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message, index) => (
+  return (
+    <AppLayout title="Pet Chatbot" showBack>
+      <div className="flex flex-col h-[calc(100vh-64px-85px)] relative">
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-4">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`flex gap-3 ${
+                message.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              {message.role === "assistant" && (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm mt-auto mb-1">
+                  <Bot className="w-4 h-4 text-white" />
+                </div>
+              )}
+              
               <div
-                key={index}
-                className={`flex gap-3 ${
-                  message.role === "user" ? "justify-end" : "justify-start"
+                className={`max-w-[75%] rounded-2xl p-3.5 ${
+                  message.role === "user"
+                    ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-br-sm shadow-md"
+                    : "bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-sm"
                 }`}
               >
-                {message.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-white" />
-                  </div>
-                )}
-                
-                <div
-                  className={`max-w-[70%] rounded-lg p-3 ${
-                    message.role === "user"
-                      ? "bg-blue-500 text-white"
-                      : "bg-white text-gray-900 shadow-md border border-gray-200"
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-                  <p className="text-xs mt-1 opacity-70">
-                    {message.timestamp.toLocaleTimeString()}
-                  </p>
-                </div>
-
-                {message.role === "user" && (
-                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                )}
+                <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
+                <p className={`text-[10px] mt-1 font-medium ${message.role === "user" ? "text-blue-100" : "text-gray-400"}`}>
+                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
               </div>
-            ))}
 
-            {isLoading && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-white" />
+              {message.role === "user" && (
+                <div className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0 mt-auto mb-1">
+                  <User className="w-4 h-4 text-blue-600" />
                 </div>
-                <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-md">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100" />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input */}
-          <div className="border-t p-4">
-            <div className="flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Ask about pet health, behavior, nutrition..."
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button
-                onClick={handleSend}
-                disabled={isLoading || !input.trim()}
-                className="bg-purple-500 hover:bg-purple-600"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
+              )}
             </div>
-            <p className="text-xs text-gray-700 mt-2 text-center">
-              💡 Try asking: "What should I feed my puppy?" or "Why is my dog scratching?"
-            </p>
+          ))}
+
+          {isLoading && (
+            <div className="flex gap-3 justify-start">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0 mt-auto mb-1 shadow-sm">
+                <Bot className="w-4 h-4 text-white" />
+              </div>
+              <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm p-4 shadow-sm">
+                <div className="flex gap-1.5">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input */}
+        <div className="p-3 bg-white/80 backdrop-blur-xl border-t border-gray-100">
+          <div className="flex gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSend()}
+              placeholder="Ask me anything..."
+              disabled={isLoading}
+              className="flex-1 rounded-full bg-gray-50 border-gray-200 focus-visible:ring-purple-500 h-12 px-4 shadow-inner"
+            />
+            <Button
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              className="rounded-full w-12 h-12 p-0 bg-gradient-to-br from-purple-500 to-indigo-600 hover:opacity-90 shadow-lg flex-shrink-0"
+            >
+              <Send className="w-5 h-5 text-white" />
+            </Button>
           </div>
-        </Card>
+        </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

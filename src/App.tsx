@@ -6,10 +6,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LiveSensorProvider } from "@/contexts/LiveSensorContext";
 import Dashboard from "./pages/Dashboard";
+import SenseAIDashboard from "./pages/SenseAIDashboard";
 import BarkSense from "./pages/BarkSense";
 import SkinSense from "./pages/SkinSense";
 import SkinSenseEnhanced from "./pages/SkinSenseEnhanced";
-import AirSense from "./pages/AirSense";
+import LocationSense from "./pages/LocationSense";
+import PressureSense from "./pages/PressureSense";
+import LightSense from "./pages/LightSense";
+import VitalSense from "./pages/VitalSense";
+import TemperatureSense from "./pages/TemperatureSense";
+import CombineSense from "./pages/CombineSense";
 import MotionSense from "./pages/MotionSense";
 import DogProfile from "./pages/DogProfile";
 import BreedEncyclopedia from "./pages/BreedEncyclopedia";
@@ -45,13 +51,17 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/sense-ai" element={<SenseAIDashboard />} />
               <Route path="/bark-sense" element={<BarkSense />} />
               <Route path="/skin-sense" element={<SkinSenseEnhanced />} />
               <Route path="/skin-sense-old" element={<SkinSense />} />
-              <Route path="/air-sense" element={<AirSense />} />
+              <Route path="/location-sense" element={<LocationSense />} />
+              <Route path="/pressure-sense" element={<PressureSense />} />
+              <Route path="/light-sense" element={<LightSense />} />
+              <Route path="/vital-sense" element={<VitalSense />} />
+              <Route path="/temperature-sense" element={<TemperatureSense />} />
+              <Route path="/combine-sense" element={<CombineSense />} />
               <Route path="/motion-sense" element={<MotionSense />} />
-              <Route path="/gut-sense" element={<AirSense />} />
-              <Route path="/poop-sense" element={<AirSense />} />
               <Route path="/pet-chatbot" element={<PetChatbot />} />
               <Route path="/dog-profile" element={<DogProfile />} />
               <Route path="/breed-encyclopedia" element={<BreedEncyclopedia />} />

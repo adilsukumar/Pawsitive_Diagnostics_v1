@@ -2,16 +2,16 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { PawPrint, AudioLines, ScanEye, Wind, Activity, LayoutDashboard, Plus, X, Sparkles, Phone } from "lucide-react";
+import { PawPrint, LayoutDashboard, Plus, X, Sparkles, Phone, BookOpen, History, Stethoscope, Bot } from "lucide-react";
 import AnimatedBackground from "./AnimatedBackground";
 import FooterCredits from "./FooterCredits";
 
 const tabs = [
-  { to: "/dashboard", icon: LayoutDashboard, label: "Home", gradient: "gradient-primary" },
-  { to: "/bark-sense", icon: AudioLines, label: "Bark", gradient: "gradient-bark" },
-  { to: "/skin-sense", icon: ScanEye, label: "Skin", gradient: "gradient-skin" },
-  { to: "/air-sense", icon: Wind, label: "Air", gradient: "gradient-air" },
-  { to: "/motion-sense", icon: Activity, label: "Motion", gradient: "gradient-motion" },
+  { to: "/dashboard", icon: LayoutDashboard, label: "Home", gradient: "bg-gradient-to-br from-blue-500 to-indigo-600" },
+  { to: "/sense-ai", icon: Sparkles, label: "Sense AI", gradient: "bg-gradient-to-br from-fuchsia-500 to-pink-500" },
+  { to: "/pet-chatbot", icon: Bot, label: "", isCenter: true },
+  { to: "/scan-history", icon: History, label: "History", gradient: "bg-gradient-to-br from-purple-500 to-fuchsia-500" },
+  { to: "/vet-services", icon: Stethoscope, label: "Vet", gradient: "bg-gradient-to-br from-rose-400 to-red-500" },
 ];
 
 const AppLayout = ({ children, title, showBack }: { children: React.ReactNode; title?: string; showBack?: boolean }) => {
@@ -129,36 +129,55 @@ const AppLayout = ({ children, title, showBack }: { children: React.ReactNode; t
 
       <main className="flex-1 overflow-y-auto pb-24">
         {children}
-        <FooterCredits />
+        {location.pathname !== "/pet-chatbot" && <FooterCredits />}
       </main>
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom mobile-container">
         <div className="glass-strong backdrop-blur-xl border-t-2 border-primary/10">
-          <div className="flex items-center justify-around px-2 py-3">
+          <div className="flex items-center justify-around px-2 py-2 relative">
             {tabs.map((tab) => {
               const active = location.pathname === tab.to || (tab.to === "/dashboard" && location.pathname === "/");
+              
+              if (tab.isCenter) {
+                return (
+                  <Link
+                    key={tab.to}
+                    to={tab.to}
+                    className="relative -top-7 flex flex-col items-center justify-center z-50"
+                  >
+                    <motion.div
+                      whileTap={{ scale: 0.9 }}
+                      className="w-[68px] h-[68px] rounded-full bg-[#8b5cf6] flex items-center justify-center shadow-[0_8px_30px_rgba(139,92,246,0.5)] ring-[6px] ring-background overflow-hidden relative group"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
+                      <tab.icon className="w-8 h-8 text-white relative z-10" strokeWidth={2} />
+                    </motion.div>
+                  </Link>
+                );
+              }
+
               return (
                 <Link
                   key={tab.to}
                   to={tab.to}
-                  className="relative flex flex-col items-center gap-1 btn-squishy"
+                  className="relative flex flex-col items-center gap-1 w-16 btn-squishy"
                 >
                   <motion.div
                     whileTap={{ scale: 0.85 }}
                     className={`relative ${
                       active
-                        ? `${tab.gradient} w-14 h-14 rounded-2xl flex items-center justify-center shadow-glow`
-                        : "w-12 h-12 rounded-xl bg-muted/30 flex items-center justify-center"
+                        ? `text-white ${tab.gradient} w-12 h-12 rounded-2xl flex items-center justify-center shadow-glow`
+                        : "w-10 h-10 rounded-xl bg-transparent flex items-center justify-center text-muted-foreground hover:bg-muted/30"
                     }`}
                   >
                     <tab.icon
-                      className={active ? "w-6 h-6 text-white" : "w-5 h-5 text-muted-foreground"}
+                      className={active ? "w-5 h-5" : "w-5 h-5"}
                       strokeWidth={active ? 2.5 : 2}
                     />
                   </motion.div>
                   <span
-                    className={`text-[10px] font-display font-semibold ${
+                    className={`text-[9px] font-display font-bold tracking-wide ${
                       active ? "text-foreground" : "text-muted-foreground"
                     }`}
                   >
