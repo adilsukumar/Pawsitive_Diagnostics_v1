@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import time
 
-app = FastAPI(title="Pawsitive Diagnostics AI Backend", version="1.0.0")
+app = FastAPI(title="Pawsitive Diagnostics Prototype API", version="0.1.0")
 
 # --- Schemas ---
 class SensorData(BaseModel):
@@ -15,12 +15,13 @@ class HealthScoreResponse(BaseModel):
     confidence: float
     status: str
 
-# --- Mock Model Inferences ---
+# --- Simulated responses used for application integration ---
 @app.post("/predict/bark")
 async def predict_bark(audio_file: UploadFile = File(...)):
     """
-    Analyzes an audio file using the BarkSense LSTM model.
-    Extracts MFCC features and classifies the acoustic emotion.
+    Returns a representative BarkSense response.
+
+    Model loading and real inference are not implemented in this endpoint yet.
     """
     # In a real environment, we would load the audio file using librosa
     # and pass it through our loaded PyTorch model.
@@ -33,7 +34,7 @@ async def predict_bark(audio_file: UploadFile = File(...)):
 @app.post("/predict/skin")
 async def predict_skin(image: UploadFile = File(...)):
     """
-    Analyzes a UV-fluorescence image using the SkinSense ResNet50 model.
+    Returns a representative SkinSense response for UI integration.
     """
     return {
         "condition_detected": "Fungal Infection (Microsporum canis)",
@@ -45,7 +46,7 @@ async def predict_skin(image: UploadFile = File(...)):
 @app.post("/predict/motion")
 async def predict_motion(data: SensorData):
     """
-    Processes 6-DOF IMU data through a 1D-CNN for GAIT analysis.
+    Returns a representative motion-analysis response for UI integration.
     """
     return {
         "gait_anomaly_detected": False,
@@ -61,7 +62,7 @@ async def get_overall_health(
     bark_stress_index: float
 ):
     """
-    Aggregates all sensor metrics using an XGBoost ensemble model.
+    Returns a representative combined score for UI integration.
     """
     # Simulated XGBoost inference
     time.sleep(0.05)
@@ -73,4 +74,4 @@ async def get_overall_health(
 
 @app.get("/health")
 def health_check():
-    return {"status": "Operational", "models_loaded": 9}
+    return {"status": "operational", "mode": "prototype", "models_loaded": 0}
