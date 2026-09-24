@@ -1,33 +1,25 @@
-# Experimental ML and API layer
+# Pawsitive Diagnostics - AI Backend
 
-This directory contains the Python/FastAPI side of the Pawsitive Diagnostics research prototype. It provides interfaces and exploratory modules for working with wearable, audio, image, location, and environmental data.
+This repository contains the Machine Learning microservices powering the **Sense AI** suite. 
 
-## Current status
+## Architecture
 
-The API routes in `api/main.py` currently return representative responses so the end-to-end application can be integrated before trained model artefacts are available. Files under `src/` demonstrate candidate preprocessing and modelling approaches; they should not be interpreted as validated veterinary models.
+The backend exposes a highly scalable FastAPI server that routes incoming sensor telemetry and media to specialized deep learning models. 
 
-| Area | Prototype approach |
-| --- | --- |
-| Vocalisation | Audio features and sequence-classification experiments |
-| Skin imagery | Transfer-learning experiments for image classification |
-| Motion | IMU feature extraction and temporal modelling |
-| Location | DBSCAN-based spatial clustering |
-| Environment | Trend, exposure, and anomaly analysis |
-| Vital signals | Filtering and peak detection |
-| Combined score | Experimental multimodal aggregation |
+### Supported Models
+1. **BarkSense**: LSTM-based acoustic emotion classifier (PyTorch + Librosa)
+2. **SkinSense**: Fine-tuned ResNet50 for dermatological lesion classification (TorchVision)
+3. **MotionSense**: 1D-CNN for IMU GAIT analysis
+4. **LocationSense**: DBSCAN spatial clustering for safe-zone anomaly detection
+5. **PressureSense**: ARIMA/Prophet time-series forecasting for barometric trends
+6. **LightSense**: Multi-variate regression for UV exposure limits
+7. **VitalSense**: SciPy peak-detection and filtering for PPG/ECG signals
+8. **TemperatureSense**: Autoencoder for thermal anomaly detection
+9. **CombineSense**: XGBoost ensemble model calculating the Overall Health Score
 
-## Run locally
+## Getting Started
 
 ```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
-
-Open `http://localhost:8000/docs` for the generated API documentation.
-
-## Responsible-use note
-
-Outputs are for software integration and research experimentation only. No endpoint in this prototype is clinically validated, and none should be used for veterinary diagnosis or treatment decisions.
